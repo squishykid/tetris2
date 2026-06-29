@@ -89,7 +89,7 @@ Each tetromino stored as 4 rotation states — arrays of `[row, col]` offsets fr
 SRS offset tables used (I-piece and JLSTZ have different tables). On rotate: try base position, then up to 4 kick offsets in order. First non-colliding position wins; if none, rotation is rejected.
 
 ### 7-Bag Randomizer
-`bag` is a shuffled array of all 7 piece types. Spawn pops from the end. When empty, refill and shuffle. `nextPiece` is always `bag[bag.length - 1]` before the pop.
+`bag` is a shuffled array of all 7 piece types. `nextPiece` holds the piece that will spawn next (shown in preview). On spawn: the current `nextPiece` becomes the new `activePiece`, then pop from `bag` to get the new `nextPiece`. When `bag` is empty, refill and shuffle before popping.
 
 ### Line Clearing
 After lock: scan rows bottom-to-top, collect full rows, remove them, prepend equal count of empty rows at top. Update `lines` count, recompute `level = Math.floor(lines / 10) + 1`, compute score delta.
