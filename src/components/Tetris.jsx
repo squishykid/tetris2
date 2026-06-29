@@ -1,4 +1,4 @@
-import { useReducer, useCallback } from 'react';
+import { useReducer } from 'react';
 import { gameReducer, INITIAL_STATE } from '../gameReducer.js';
 import { useGameLoop } from '../hooks/useGameLoop.js';
 import { useInput } from '../hooks/useInput.js';
@@ -13,19 +13,30 @@ function Overlay({ children }) {
   );
 }
 
+function StatRow({ label, value }) {
+  return (
+    <div className="mb-4">
+      <p className="text-gray-400 text-xs uppercase tracking-widest">{label}</p>
+      <p className="text-white text-2xl font-mono font-bold">{value}</p>
+    </div>
+  );
+}
+
 export default function Tetris() {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
   const { board, activePiece, ghostY, nextPiece, score, level, lines, phase } = state;
 
-  const stableDispatch = useCallback(dispatch, []);
-
-  useGameLoop(stableDispatch, phase, level);
-  useInput(stableDispatch);
+  useGameLoop(dispatch, phase, level);
+  useInput(dispatch);
 
   return (
     <div className="flex gap-8 items-start select-none">
-      {/* Left padding to balance layout */}
-      <div className="w-28" />
+      {/* Left panel: score / level / lines */}
+      <div className="flex flex-col w-28">
+        <StatRow label="Score" value={score} />
+        <StatRow label="Level" value={level} />
+        <StatRow label="Lines" value={lines} />
+      </div>
 
       {/* Board with overlays */}
       <div className="relative">
@@ -54,7 +65,8 @@ export default function Tetris() {
         )}
       </div>
 
-      <Sidebar score={score} level={level} lines={lines} nextPiece={nextPiece} />
+      {/* Right panel: next piece + controls */}
+      <Sidebar nextPiece={nextPiece} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { COLORS, BOARD_COLS, BOARD_ROWS } from '../constants.js';
+import { SOLID_CLASSES, BOARD_COLS, BOARD_ROWS } from '../constants.js';
 import { PIECES, getPieceCells } from '../tetrominoes.js';
 
 // Build a display grid: start from locked board, overlay ghost + active piece
@@ -27,16 +27,6 @@ function buildDisplayGrid(board, activePiece, ghostY) {
   return grid;
 }
 
-// Tailwind doesn't support dynamic class composition; use a lookup instead
-const SOLID_CLASSES = {
-  1: 'bg-cyan-400',
-  2: 'bg-yellow-400',
-  3: 'bg-purple-500',
-  4: 'bg-green-500',
-  5: 'bg-red-500',
-  6: 'bg-blue-600',
-  7: 'bg-orange-500',
-};
 
 const GHOST_CLASSES = {
   1: 'border-2 border-cyan-400',
@@ -50,7 +40,7 @@ const GHOST_CLASSES = {
 
 function cellClass({ color, ghost }) {
   if (color === 0) return 'bg-gray-800 border border-gray-700';
-  if (ghost) return `${GHOST_CLASSES[color]} bg-transparent`;
+  if (ghost) return `${GHOST_CLASSES[color]} bg-transparent opacity-40`;
   return SOLID_CLASSES[color];
 }
 

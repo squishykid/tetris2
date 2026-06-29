@@ -15,6 +15,17 @@ export const COLORS = {
   7: 'bg-orange-500',  // L
 };
 
+// Tailwind doesn't support dynamic class composition; use a lookup instead
+export const SOLID_CLASSES = {
+  1: 'bg-cyan-400',
+  2: 'bg-yellow-400',
+  3: 'bg-purple-500',
+  4: 'bg-green-500',
+  5: 'bg-red-500',
+  6: 'bg-blue-600',
+  7: 'bg-orange-500',
+};
+
 // Points per lines-cleared multiplied by current level
 export const SCORE_TABLE = { 1: 100, 2: 300, 3: 500, 4: 800 };
 

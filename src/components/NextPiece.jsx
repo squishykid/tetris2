@@ -1,14 +1,5 @@
 import { PIECES } from '../tetrominoes.js';
-
-const SOLID_CLASSES = {
-  1: 'bg-cyan-400',
-  2: 'bg-yellow-400',
-  3: 'bg-purple-500',
-  4: 'bg-green-500',
-  5: 'bg-red-500',
-  6: 'bg-blue-600',
-  7: 'bg-orange-500',
-};
+import { SOLID_CLASSES } from '../constants.js';
 
 export default function NextPiece({ type }) {
   if (!type) return null;
