@@ -75,13 +75,17 @@ describe('line clearing', () => {
     return { ...s, board: filledBoard, activePiece: pieceAtTop };
   }
 
-  it('enters clearing phase without scoring immediately', () => {
+  it('enters clearing phase and defers the line-clear score bonus', () => {
     const setup = fullBoardSetup();
     const s2 = gameReducer(setup, { type: 'HARD_DROP' });
     expect(s2.phase).toBe('clearing');
-    expect(s2.score).toBe(setup.score);
     expect(s2.clearingRows.length).toBeGreaterThan(0);
     expect(s2.clearingRows).toEqual(expect.arrayContaining([19]));
+    // HARD_DROP always adds its own drop-distance bonus immediately, so we
+    // can't assert s2.score === setup.score here — only that the line-clear
+    // bonus itself (added in finishClear) hasn't landed yet.
+    const s3 = gameReducer(s2, { type: 'FINISH_CLEAR' });
+    expect(s3.score).toBeGreaterThan(s2.score);
   });
 
   it('ignores gameplay actions while clearing', () => {
