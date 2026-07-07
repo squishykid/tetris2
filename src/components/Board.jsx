@@ -38,14 +38,16 @@ const GHOST_CLASSES = {
   7: 'border-2 border-orange-500',
 };
 
-function cellClass({ color, ghost }) {
+function cellClass({ color, ghost }, isClearing) {
+  if (isClearing) return 'bg-white transition-colors duration-300';
   if (color === 0) return 'bg-gray-800 border border-gray-700';
   if (ghost) return `${GHOST_CLASSES[color]} bg-transparent opacity-40`;
   return SOLID_CLASSES[color];
 }
 
-export default function Board({ board, activePiece, ghostY }) {
+export default function Board({ board, activePiece, ghostY, clearingRows = [] }) {
   const grid = buildDisplayGrid(board, activePiece, ghostY);
+  const clearingSet = new Set(clearingRows);
 
   return (
     <div
@@ -56,7 +58,7 @@ export default function Board({ board, activePiece, ghostY }) {
         row.map((cell, c) => (
           <div
             key={`${r}-${c}`}
-            className={`w-7 h-7 ${cellClass(cell)}`}
+            className={`w-7 h-7 ${cellClass(cell, clearingSet.has(r))}`}
           />
         ))
       )}
