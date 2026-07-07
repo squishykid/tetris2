@@ -15,6 +15,9 @@ describe('INITIAL_STATE', () => {
     expect(INITIAL_STATE.board[0]).toHaveLength(10);
     expect(INITIAL_STATE.board[0][0]).toBe(0);
   });
+  it('clearingRows is empty', () => {
+    expect(INITIAL_STATE.clearingRows).toEqual([]);
+  });
 });
 
 describe('START action', () => {
@@ -112,18 +115,58 @@ describe('PAUSE', () => {
 });
 
 describe('line clearing', () => {
-  it('clears full rows and updates score', () => {
-    // Build a state with 19 full rows + 1 empty top row, piece above
+  function fullBoardSetup() {
     const s = startedState();
     // Fill rows 1-19 completely (leave row 0 empty)
     const filledBoard = s.board.map((row, i) =>
       i === 0 ? row : row.map(() => 1)
     );
-    // Place active piece at top (y near 0) so hard drop clears rows
+    // Place active piece at top (y near 0) so hard drop completes rows 1-19
     const pieceAtTop = { ...s.activePiece, x: 0, y: -1 };
-    const setup = { ...s, board: filledBoard, activePiece: pieceAtTop };
+    return { ...s, board: filledBoard, activePiece: pieceAtTop };
+  }
+
+  it('enters clearing phase and defers the line-clear score bonus', () => {
+    const setup = fullBoardSetup();
     const s2 = gameReducer(setup, { type: 'HARD_DROP' });
-    // Score should have increased
-    expect(s2.score).toBeGreaterThan(0);
+    expect(s2.phase).toBe('clearing');
+    expect(s2.clearingRows.length).toBeGreaterThan(0);
+    expect(s2.clearingRows).toEqual(expect.arrayContaining([19]));
+    const s3 = gameReducer(s2, { type: 'FINISH_CLEAR' });
+    expect(s3.score).toBeGreaterThan(s2.score);
+  });
+
+  it('ignores gameplay actions while clearing', () => {
+    const setup = fullBoardSetup();
+    const clearing = gameReducer(setup, { type: 'HARD_DROP' });
+    const y0 = clearing.activePiece.y;
+    const ticked = gameReducer(clearing, { type: 'TICK' });
+    expect(ticked).toBe(clearing);
+    expect(ticked.activePiece.y).toBe(y0);
+  });
+
+  it('FINISH_CLEAR removes rows, scores, and spawns next piece', () => {
+    const setup = fullBoardSetup();
+    const clearing = gameReducer(setup, { type: 'HARD_DROP' });
+    const s2 = gameReducer(clearing, { type: 'FINISH_CLEAR' });
+    expect(s2.phase).toBe('playing');
+    expect(s2.clearingRows).toEqual([]);
+    expect(s2.score).toBeGreaterThan(setup.score);
+    expect(s2.lines).toBeGreaterThan(0);
+    expect(['I','O','T','S','Z','J','L']).toContain(s2.activePiece.type);
+  });
+
+  it('FINISH_CLEAR triggers game over if the new piece cannot spawn', () => {
+    // Hand-craft a 'clearing' state directly rather than routing through
+    // HARD_DROP, so the test doesn't depend on randomized piece type or
+    // ghostY. Row 19 is the only row about to be cleared; rows 0-3 are
+    // packed solid, so after the clear shifts everything down by 1 row,
+    // rows 1-3 are still packed and block the T piece's spawn cells.
+    const s = startedState();
+    const packedRow = () => Array(10).fill(1);
+    const board = s.board.map((row, i) => (i === 19 || i <= 3) ? packedRow() : row);
+    const clearingState = { ...s, board, clearingRows: [19], phase: 'clearing', nextPiece: 'T' };
+    const s2 = gameReducer(clearingState, { type: 'FINISH_CLEAR' });
+    expect(s2.phase).toBe('gameover');
   });
 });

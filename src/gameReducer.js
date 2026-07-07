@@ -40,22 +40,60 @@ function lockPiece(board, type, rotation, x, y) {
   return next;
 }
 
-// Remove full rows, prepend empty rows. Returns { newBoard, linesCleared }.
-function clearLines(board) {
-  const remaining = board.filter(row => row.some(cell => cell === 0));
-  const linesCleared = BOARD_ROWS - remaining.length;
-  const empty = Array.from({ length: linesCleared }, () => Array(BOARD_COLS).fill(0));
-  return { newBoard: [...empty, ...remaining], linesCleared };
+// Row indices (0-based) that are completely filled
+function findFullRows(board) {
+  const rows = [];
+  board.forEach((row, i) => {
+    if (row.every(cell => cell !== 0)) rows.push(i);
+  });
+  return rows;
 }
 
-// Shared logic for locking a piece, clearing lines, and spawning the next piece
+// Remove the given row indices, prepend empty rows to keep board height
+function removeRows(board, rowIndices) {
+  const toRemove = new Set(rowIndices);
+  const remaining = board.filter((_, i) => !toRemove.has(i));
+  const empty = Array.from({ length: rowIndices.length }, () => Array(BOARD_COLS).fill(0));
+  return [...empty, ...remaining];
+}
+
+// Locks the active piece; defers to 'clearing' phase if any rows completed,
+// otherwise spawns the next piece immediately (mirrors pre-flash behavior).
 function afterLock(state) {
-  const { activePiece, board, bag, nextPiece, score, level, lines } = state;
+  const { activePiece, board, nextPiece, bag } = state;
   const lockedBoard = lockPiece(board, activePiece.type, activePiece.rotation, activePiece.x, activePiece.y);
-  const { newBoard, linesCleared } = clearLines(lockedBoard);
+  const fullRows = findFullRows(lockedBoard);
+
+  if (fullRows.length > 0) {
+    return { ...state, board: lockedBoard, clearingRows: fullRows, phase: 'clearing' };
+  }
+
+  const newActive = spawnPiece(nextPiece);
+  const { piece: newNext, bag: newBag } = drawFromBag(bag);
+
+  if (collides(lockedBoard, newActive.type, newActive.rotation, newActive.x, newActive.y)) {
+    return { ...state, board: lockedBoard, phase: 'gameover' };
+  }
+
+  return {
+    ...state,
+    board: lockedBoard,
+    activePiece: newActive,
+    ghostY: computeGhostY(lockedBoard, newActive.type, newActive.rotation, newActive.x, newActive.y),
+    bag: newBag,
+    nextPiece: newNext,
+    phase: 'playing',
+  };
+}
+
+// Removes previously-detected full rows, applies score/lines/level, spawns next piece
+function finishClear(state) {
+  const { board, clearingRows, nextPiece, bag, score, level, lines } = state;
+  const newBoard = removeRows(board, clearingRows);
+  const linesCleared = clearingRows.length;
 
   const scorePerClear = SCORE_TABLE[linesCleared] ?? SCORE_TABLE[4];
-  const newScore = score + (linesCleared > 0 ? scorePerClear * level : 0);
+  const newScore = score + scorePerClear * level;
   const newLines = lines + linesCleared;
   const newLevel = Math.floor(newLines / 10) + 1;
 
@@ -63,7 +101,15 @@ function afterLock(state) {
   const { piece: newNext, bag: newBag } = drawFromBag(bag);
 
   if (collides(newBoard, newActive.type, newActive.rotation, newActive.x, newActive.y)) {
-    return { ...state, board: newBoard, score: newScore, lines: newLines, level: newLevel, phase: 'gameover' };
+    return {
+      ...state,
+      board: newBoard,
+      score: newScore,
+      lines: newLines,
+      level: newLevel,
+      clearingRows: [],
+      phase: 'gameover',
+    };
   }
 
   return {
@@ -76,6 +122,7 @@ function afterLock(state) {
     score: newScore,
     lines: newLines,
     level: newLevel,
+    clearingRows: [],
     phase: 'playing',
   };
 }
@@ -92,11 +139,17 @@ export const INITIAL_STATE = {
   level: 1,
   lines: 0,
   phase: 'idle',
+  clearingRows: [],
 };
 
 export function gameReducer(state, action) {
-  // Only START and PAUSE work outside of playing
-  if (state.phase !== 'playing' && action.type !== 'START' && action.type !== 'PAUSE') {
+  // Only START, PAUSE, and FINISH_CLEAR work outside of playing
+  if (
+    state.phase !== 'playing' &&
+    action.type !== 'START' &&
+    action.type !== 'PAUSE' &&
+    action.type !== 'FINISH_CLEAR'
+  ) {
     return state;
   }
 
@@ -119,7 +172,12 @@ export function gameReducer(state, action) {
         level: 1,
         lines: 0,
         phase: 'playing',
+        clearingRows: [],
       };
+    }
+
+    case 'FINISH_CLEAR': {
+      return finishClear(state);
     }
 
     case 'PAUSE': {
