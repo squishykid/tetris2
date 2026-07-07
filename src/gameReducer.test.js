@@ -169,4 +169,10 @@ describe('line clearing', () => {
     const s2 = gameReducer(clearingState, { type: 'FINISH_CLEAR' });
     expect(s2.phase).toBe('gameover');
   });
+
+  it('FINISH_CLEAR is a no-op outside the clearing phase', () => {
+    const s = startedState();
+    const s2 = gameReducer(s, { type: 'FINISH_CLEAR' });
+    expect(s2).toBe(s);
+  });
 });

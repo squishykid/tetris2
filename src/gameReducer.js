@@ -177,6 +177,7 @@ export function gameReducer(state, action) {
     }
 
     case 'FINISH_CLEAR': {
+      if (state.phase !== 'clearing') return state;
       return finishClear(state);
     }
 
