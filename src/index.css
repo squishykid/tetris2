@@ -5,3 +5,29 @@
 * {
   font-family: "Comic Sans MS", "Comic Sans", cursive;
 }
+
+/* Active (falling) piece cells cycle through the rainbow */
+.rainbow-cell {
+  background: linear-gradient(
+    135deg,
+    #f43f5e,
+    #f97316,
+    #eab308,
+    #22c55e,
+    #3b82f6,
+    #a855f7
+  );
+  background-size: 400% 400%;
+  animation: rainbow-shift 2s linear infinite;
+}
+
+@keyframes rainbow-shift {
+  0% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    background-position: 100% 50%;
+    filter: hue-rotate(360deg);
+  }
+}
