@@ -7,16 +7,18 @@ describe('constants', () => {
     expect(BOARD_ROWS).toBe(20);
   });
 
-  it('has 7 piece types', () => {
-    expect(PIECE_TYPES).toHaveLength(7);
+  it('has 8 piece types', () => {
+    expect(PIECE_TYPES).toHaveLength(8);
     expect(PIECE_TYPES).toContain('I');
     expect(PIECE_TYPES).toContain('O');
+    expect(PIECE_TYPES).toContain('TRI');
   });
 
-  it('colors maps 0-7', () => {
+  it('colors maps 0-8', () => {
     expect(COLORS[0]).toBeNull();
     expect(COLORS[1]).toMatch(/cyan/);
     expect(COLORS[7]).toMatch(/orange/);
+    expect(COLORS[8]).toMatch(/pink/);
   });
 
   it('score table', () => {

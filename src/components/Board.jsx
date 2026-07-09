@@ -1,26 +1,33 @@
 import { SOLID_CLASSES, BOARD_COLS, BOARD_ROWS } from '../constants.js';
-import { PIECES, getPieceCells } from '../tetrominoes.js';
+import { PIECES, getPieceCellsWithClips, TRIANGLE_CLIP_PATHS } from '../tetrominoes.js';
+
+// A locked board cell is either a color index or a { color, clip } object
+// (triangle cells). Normalize to { color, clip }.
+function normalizeCell(cell) {
+  if (cell && typeof cell === 'object') return { color: cell.color, clip: cell.clip };
+  return { color: cell, clip: 'FULL' };
+}
 
 // Build a display grid: start from locked board, overlay ghost + active piece
 function buildDisplayGrid(board, activePiece, ghostY) {
-  // Deep copy board
-  const grid = board.map(row => row.map(cell => ({ color: cell, ghost: false })));
+  const grid = board.map(row => row.map(cell => ({ ...normalizeCell(cell), ghost: false })));
 
   if (!activePiece) return grid;
 
   const { type, rotation, x, y } = activePiece;
+  const color = PIECES[type].color;
 
   // Ghost cells (outlined, not filled)
-  getPieceCells(type, rotation, x, ghostY).forEach(([r, c]) => {
+  getPieceCellsWithClips(type, rotation, x, ghostY).forEach(({ r, c, clip }) => {
     if (r >= 0 && r < BOARD_ROWS && c >= 0 && c < BOARD_COLS && grid[r][c].color === 0) {
-      grid[r][c] = { color: PIECES[type].color, ghost: true };
+      grid[r][c] = { color, clip, ghost: true };
     }
   });
 
   // Active piece cells (solid, rainbow)
-  getPieceCells(type, rotation, x, y).forEach(([r, c]) => {
+  getPieceCellsWithClips(type, rotation, x, y).forEach(({ r, c, clip }) => {
     if (r >= 0 && r < BOARD_ROWS && c >= 0 && c < BOARD_COLS) {
-      grid[r][c] = { color: PIECES[type].color, ghost: false, active: true };
+      grid[r][c] = { color, clip, ghost: false, active: true };
     }
   });
 
@@ -56,12 +63,16 @@ export default function Board({ board, activePiece, ghostY, clearingRows = [] })
       style={{ gridTemplateColumns: `repeat(${BOARD_COLS}, 1.75rem)` }}
     >
       {grid.map((row, r) =>
-        row.map((cell, c) => (
-          <div
-            key={`${r}-${c}`}
-            className={`w-7 h-7 ${cellClass(cell, clearingSet.has(r))}`}
-          />
-        ))
+        row.map((cell, c) => {
+          const clipPath = clearingSet.has(r) ? undefined : TRIANGLE_CLIP_PATHS[cell.clip];
+          return (
+            <div
+              key={`${r}-${c}`}
+              className={`w-7 h-7 ${cellClass(cell, clearingSet.has(r))}`}
+              style={clipPath ? { clipPath } : undefined}
+            />
+          );
+        })
       )}
     </div>
   );

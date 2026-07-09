@@ -1,6 +1,13 @@
 // src/tetrominoes.test.js
 import { describe, it, expect } from 'vitest';
-import { PIECES, getPieceCells, spawnPiece, tryRotate } from './tetrominoes.js';
+import {
+  PIECES,
+  getPieceCells,
+  getPieceCellsWithClips,
+  spawnPiece,
+  tryRotate,
+  TRIANGLE_CLIP_PATHS,
+} from './tetrominoes.js';
 import { BOARD_COLS, BOARD_ROWS } from './constants.js';
 
 describe('PIECES', () => {
@@ -22,6 +29,45 @@ describe('PIECES', () => {
     expect(r0).toEqual(r1);
     expect(r0).toEqual(r2);
     expect(r0).toEqual(r3);
+  });
+});
+
+describe('TRI piece', () => {
+  it('has 4 rotations of 3 cells each, all inside a 2x2 box', () => {
+    expect(PIECES.TRI.shapes).toHaveLength(4);
+    for (const shape of PIECES.TRI.shapes) {
+      expect(shape).toHaveLength(3);
+      for (const [r, c] of shape) {
+        expect(r).toBeGreaterThanOrEqual(0);
+        expect(r).toBeLessThan(2);
+        expect(c).toBeGreaterThanOrEqual(0);
+        expect(c).toBeLessThan(2);
+      }
+    }
+  });
+
+  it('has a clip code for every cell, all resolving to known clip-paths', () => {
+    PIECES.TRI.shapes.forEach((shape, rot) => {
+      expect(PIECES.TRI.clips[rot]).toHaveLength(shape.length);
+      for (const code of PIECES.TRI.clips[rot]) {
+        expect(TRIANGLE_CLIP_PATHS).toHaveProperty(code);
+      }
+    });
+  });
+
+  it('getPieceCellsWithClips pairs each cell with its clip code', () => {
+    const cells = getPieceCellsWithClips('TRI', 0, 3, 5);
+    expect(cells).toHaveLength(3);
+    // rotation 0: [[0,0],[1,0],[1,1]] with clips ['LL','FULL','LL']
+    expect(cells[0]).toEqual({ r: 5, c: 3, clip: 'LL' });
+    expect(cells[1]).toEqual({ r: 6, c: 3, clip: 'FULL' });
+    expect(cells[2]).toEqual({ r: 6, c: 4, clip: 'LL' });
+  });
+
+  it('non-triangle pieces report FULL clips', () => {
+    for (const { clip } of getPieceCellsWithClips('T', 0, 0, 0)) {
+      expect(clip).toBe('FULL');
+    }
   });
 });
 
