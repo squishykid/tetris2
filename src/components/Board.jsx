@@ -17,10 +17,10 @@ function buildDisplayGrid(board, activePiece, ghostY) {
     }
   });
 
-  // Active piece cells (solid)
+  // Active piece cells (solid, rainbow)
   getPieceCells(type, rotation, x, y).forEach(([r, c]) => {
     if (r >= 0 && r < BOARD_ROWS && c >= 0 && c < BOARD_COLS) {
-      grid[r][c] = { color: PIECES[type].color, ghost: false };
+      grid[r][c] = { color: PIECES[type].color, ghost: false, active: true };
     }
   });
 
@@ -38,10 +38,11 @@ const GHOST_CLASSES = {
   7: 'border-2 border-orange-500',
 };
 
-function cellClass({ color, ghost }, isClearing) {
+function cellClass({ color, ghost, active }, isClearing) {
   if (isClearing) return 'bg-white transition-colors duration-300';
   if (color === 0) return 'bg-gray-800 border border-gray-700';
   if (ghost) return `${GHOST_CLASSES[color]} bg-transparent opacity-40`;
+  if (active) return 'rainbow-cell';
   return SOLID_CLASSES[color];
 }
 
