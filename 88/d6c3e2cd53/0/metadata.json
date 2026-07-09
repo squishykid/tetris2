@@ -1,0 +1,88 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "88d6c3e2cd53",
+  "session_id": "3b16d894-9b9e-4c1a-909c-2a506ef5214b",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-09T14:41:22.40085Z",
+  "branch": "add-triangle-to-the-game",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/constants.js",
+    "src/tetrominoes.js",
+    "src/gameReducer.js",
+    "src/components/Board.jsx",
+    "src/components/NextPiece.jsx",
+    "src/constants.test.js",
+    "src/gameReducer.test.js",
+    "src/tetrominoes.test.js"
+  ],
+  "agent": "Claude Code",
+  "model": "",
+  "turn_id": "7052f2c68611",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 16632,
+    "cache_creation_tokens": 111346,
+    "cache_read_tokens": 2073848,
+    "output_tokens": 29511,
+    "api_call_count": 31
+  },
+  "skill_events_version": 1,
+  "skill_events": [
+    {
+      "id": "claude-skill-toolu_01TxaSUEwa9JaK9Eq5MLmiYp",
+      "event_type": "tool_invocation",
+      "skill": {
+        "name": "run"
+      },
+      "source": {
+        "agent": "claude-code",
+        "signal": "skill_tool_use",
+        "confidence": "explicit"
+      },
+      "turn_id": "7052f2c68611",
+      "transcript_anchor": {
+        "unit": "line",
+        "start": 141,
+        "end": 142,
+        "entry_ids": [
+          "7fdbcd5a-63be-45a1-a10a-01e841cdd3a2"
+        ],
+        "tool_use_id": "toolu_01TxaSUEwa9JaK9Eq5MLmiYp"
+      },
+      "native": {
+        "tool_name": "Skill",
+        "tool_use_id": "toolu_01TxaSUEwa9JaK9Eq5MLmiYp"
+      },
+      "collapse": {
+        "target": "tool_pair",
+        "label": "Skill: run",
+        "default_collapsed": true
+      }
+    }
+  ],
+  "initial_attribution": {
+    "calculated_at": "2026-07-09T14:41:22.387284Z",
+    "agent_lines": 167,
+    "agent_removed": 41,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 167,
+    "total_lines_changed": 208,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 10,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".idea/.gitignore": 10
+      }
+    }
+  ]
+}
