@@ -1,0 +1,48 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "b23ab355728f",
+  "session_id": "c92e5a36-a9a0-436a-a324-26a4e329c598",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-09T06:58:26.734478Z",
+  "branch": "make-the-cursor-a-rainbow",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/components/Board.jsx",
+    "src/index.css"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-fable-5",
+  "turn_id": "bacea192ad9b",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 12442,
+    "cache_creation_tokens": 24905,
+    "cache_read_tokens": 434536,
+    "output_tokens": 4403,
+    "api_call_count": 12
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-09T06:58:26.729033Z",
+    "agent_lines": 30,
+    "agent_removed": 3,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 30,
+    "total_lines_changed": 33,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 10,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".idea/.gitignore": 10
+      }
+    }
+  ]
+}
