@@ -1,6 +1,8 @@
 // src/gameReducer.test.js
 import { describe, it, expect } from 'vitest';
 import { INITIAL_STATE, gameReducer } from './gameReducer.js';
+import { PIECES } from './tetrominoes.js';
+import { PIECE_TYPES } from './constants.js';
 
 function startedState() {
   return gameReducer(INITIAL_STATE, { type: 'START' });
@@ -27,11 +29,11 @@ describe('START action', () => {
   });
   it('spawns an active piece with valid type', () => {
     const s = startedState();
-    expect(['I','O','T','S','Z','J','L']).toContain(s.activePiece.type);
+    expect(PIECE_TYPES).toContain(s.activePiece.type);
   });
   it('sets a nextPiece', () => {
     const s = startedState();
-    expect(['I','O','T','S','Z','J','L']).toContain(s.nextPiece);
+    expect(PIECE_TYPES).toContain(s.nextPiece);
   });
   it('score and lines start at 0', () => {
     const s = startedState();
@@ -80,9 +82,9 @@ describe('HARD_DROP', () => {
     const type0 = s.activePiece.type;
     const s2 = gameReducer(s, { type: 'HARD_DROP' });
     // Active piece should have changed (new piece spawned)
-    // Board should have some locked cells
+    // Board should have exactly the dropped piece's cells locked
     const totalLocked = s2.board.flat().filter(c => c !== 0).length;
-    expect(totalLocked).toBe(4); // one piece locked = 4 cells
+    expect(totalLocked).toBe(PIECES[type0].shapes[0].length);
     // Phase is still playing (no game over on fresh board)
     expect(s2.phase).toBe('playing');
   });
@@ -153,7 +155,7 @@ describe('line clearing', () => {
     expect(s2.clearingRows).toEqual([]);
     expect(s2.score).toBeGreaterThan(setup.score);
     expect(s2.lines).toBeGreaterThan(0);
-    expect(['I','O','T','S','Z','J','L']).toContain(s2.activePiece.type);
+    expect(PIECE_TYPES).toContain(s2.activePiece.type);
   });
 
   it('FINISH_CLEAR triggers game over if the new piece cannot spawn', () => {

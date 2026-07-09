@@ -1,9 +1,9 @@
 export const BOARD_COLS = 10;
 export const BOARD_ROWS = 20;
 
-export const PIECE_TYPES = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
+export const PIECE_TYPES = ['I', 'O', 'T', 'S', 'Z', 'J', 'L', 'TRI'];
 
-// null = empty cell; 1-7 = piece color index
+// null = empty cell; 1-8 = piece color index
 export const COLORS = {
   0: null,
   1: 'bg-cyan-400',    // I
@@ -13,6 +13,7 @@ export const COLORS = {
   5: 'bg-red-500',     // Z
   6: 'bg-blue-600',    // J
   7: 'bg-orange-500',  // L
+  8: 'bg-pink-500',    // TRI
 };
 
 // Tailwind doesn't support dynamic class composition; use a lookup instead
@@ -24,6 +25,7 @@ export const SOLID_CLASSES = {
   5: 'bg-red-500',
   6: 'bg-blue-600',
   7: 'bg-orange-500',
+  8: 'bg-pink-500',
 };
 
 // Points per lines-cleared multiplied by current level

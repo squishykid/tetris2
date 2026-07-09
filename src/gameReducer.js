@@ -5,6 +5,7 @@ import {
   collides,
   computeGhostY,
   getPieceCells,
+  getPieceCellsWithClips,
   tryRotate,
 } from './tetrominoes.js';
 
@@ -29,12 +30,16 @@ function drawFromBag(bag) {
   return { piece, bag: refilled.slice(0, -1) };
 }
 
-// Lock active piece onto board; returns new board
+// Lock active piece onto board; returns new board. Triangle cells are stored as
+// { color, clip } objects so they keep their triangular look once locked; every
+// other piece stores a plain color index. Both are truthy, so line-clear and
+// collision checks (cell !== 0) treat them identically.
 function lockPiece(board, type, rotation, x, y) {
   const next = board.map(row => [...row]);
-  getPieceCells(type, rotation, x, y).forEach(([r, c]) => {
+  const color = PIECES[type].color;
+  getPieceCellsWithClips(type, rotation, x, y).forEach(({ r, c, clip }) => {
     if (r >= 0 && r < BOARD_ROWS && c >= 0 && c < BOARD_COLS) {
-      next[r][c] = PIECES[type].color;
+      next[r][c] = clip && clip !== 'FULL' ? { color, clip } : color;
     }
   });
   return next;
